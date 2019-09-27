@@ -22,7 +22,7 @@ extern "C" {
 #include "interface/mmal/util/mmal_default_components.h"
 #include "interface/mmal/util/mmal_connection.h"
 
-#include "Broadcaster.h"
+#include "UdpBroadcaster.h"
 
 
 #define MMAL_CAMERA_VIDEO_PORT   1
@@ -39,10 +39,9 @@ AVFrame *frame;
 AVCodecContext *codec_context= nullptr;
 AVPacket *pkt;
 
-uint8_t * output_buffer = nullptr;
 std::mutex callback_mutex;
 
-static void encode(AVFrame *encode_frame, Broadcaster* broadcaster)
+static void encode(AVFrame *encode_frame, UdpBroadcaster* broadcaster)
 {
     int ret;
 
@@ -80,9 +79,6 @@ void color_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer) {
     lock_guard<std::mutex> callback_lock_guard(callback_mutex);
     MMAL_BUFFER_HEADER_T *new_buffer;
     mmal_buffer_header_mem_lock(buffer);
-    if (output_buffer == nullptr) {
-        output_buffer = static_cast<uint8_t *>(malloc(buffer->alloc_size));
-    }
 
     int ret = av_frame_make_writable(frame);
     if (ret < 0)
@@ -124,7 +120,7 @@ void color_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer) {
         if (!new_buffer || status != MMAL_SUCCESS)
             cerr << "Unable to return a buffer to the video port" <<endl;
     }
-    encode(frame, (Broadcaster*)port->userdata);
+    encode(frame, (UdpBroadcaster*)port->userdata);
     frame_count++;
 }
 
@@ -135,13 +131,13 @@ int main(int argc, char **argv) {
     try {
         json_parser::read_json("settings.json", *settings);
     }
-    catch (json_parser_error error) {
+    catch (json_parser_error& error) {
 
     }
 
     boost::asio::io_service io_service;
     std::cout<<"Hello world!"<<std::endl;
-    Broadcaster broadcaster(settings, io_service);
+    UdpBroadcaster broadcaster(settings, io_service);
 
 
     const char  *codec_name;
@@ -309,7 +305,7 @@ int main(int argc, char **argv) {
     try {
         json_parser::write_json("settings.json", *settings);
     }
-    catch (json_parser_error error) {
+    catch (json_parser_error& error) {
 
     }
 

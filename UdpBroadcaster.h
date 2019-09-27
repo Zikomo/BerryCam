@@ -14,9 +14,9 @@
 
 using namespace boost::property_tree;
 
-class Broadcaster {
+class UdpBroadcaster {
 public:
-    explicit Broadcaster(std::shared_ptr<ptree> settings, boost::asio::io_service &io_service);
+    explicit UdpBroadcaster(std::shared_ptr<ptree> settings, boost::asio::io_service &io_service);
     void SendPacket(uint8_t *data, int size);
 
 private:

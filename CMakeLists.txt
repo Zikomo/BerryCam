@@ -3,7 +3,7 @@ project(BerryCam)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(BerryCam main.cpp Broadcaster.cpp Broadcaster.h Utilities.cpp Utilities.h)
+add_executable(BerryCam main.cpp UdpBroadcaster.cpp UdpBroadcaster.h Utilities.cpp Utilities.h Camera.h Encoder.h RaspberryPiCamera.cpp RaspberryPiCamera.h)
 
 find_package(Boost REQUIRED COMPONENTS system)
 
@@ -17,9 +17,9 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES arm*)
     FIND_LIBRARY(mmalutil_LIBS NAMES mmal_util PATHS /opt/vc/lib)
     FIND_LIBRARY(mmal_LIBS NAMES mmal PATHS /opt/vc/lib)
     FIND_LIBRARY(bcm_host_LIBS NAMES bcm_host PATHS /opt/vc/lib)
-    IF( (NOT mmal_LIBS ) OR (NOT mmalutil_LIBS) OR (NOT mmalcore_LIBS) OR (NOT bcm_host_LIBS) OR (NOT avcodec_LIBS))
+    if( (NOT mmal_LIBS ) OR (NOT mmalutil_LIBS) OR (NOT mmalcore_LIBS) OR (NOT bcm_host_LIBS) OR (NOT avcodec_LIBS))
         MESSAGE(FATAL_ERROR "Could not find mmal libraries")
-    ENDIF()
+    endif()
     set(REQUIRED_LIBRARIES ${REQUIRED_LIBRARIES} ${mmalcore_LIBS} ${mmalutil_LIBS} ${mmal_LIBS} ${bcm_host_LIBS} ${avcodec_LIBS} ${avutil_LIBS} ${Boost_LIBRARIES})
     link_directories( ${Boost_LIBRARY_DIRS})
     target_link_libraries(BerryCam  ${mmalcore_LIBS} ${mmalutil_LIBS} ${mmal_LIBS} ${bcm_host_LIBS} ${avcodec_LIBS}  ${avutil_LIBS} ${Boost_LIBRARIES})
@@ -27,13 +27,7 @@ else()
     include_directories(/usr/local/Cellar/ffmpeg/4.1.1/include  )
     include_directories(dependencies)
 
-ENDIF()
+endif()
 
-##If opencv installed, creates the libraspicam_cv library module
-#FIND_PACKAGE(OpenCV)
-#IF(OpenCV_FOUND)
-#    include_directories(${OpenCV_INCLUDE_DIRS})
-#    SET(LIB_COMPONENTS ${LIB_COMPONENTS} ${PROJECT_NAME}_cv)
-#    SET(PROJECT_CV_CREATED_FLAG "YES")
-#ENDIF()
+
 

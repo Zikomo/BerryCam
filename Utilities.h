@@ -22,6 +22,18 @@ public:
         return settings->get<T>(key);
     }
 
+    template<class T>
+    static T SafeGet(ptree& settings, std::string key, T default_value)
+    {
+        auto iterator = settings.find(key);
+        boost::optional<T> value = settings.get_optional<T>(key);
+        if (!value) {
+            settings.put<T>(key, default_value);
+            return default_value;
+        }
+        return settings.get<T>(key);
+    }
+
 };
 
 
