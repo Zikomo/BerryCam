@@ -5,7 +5,6 @@
 #ifndef BERRYCAM_RASPBERRYPICAMERA_H
 #define BERRYCAM_RASPBERRYPICAMERA_H
 
-
 #include "Camera.h"
 #include "bcm_host.h"
 #include "interface/mmal/mmal.h"
@@ -16,39 +15,47 @@
 #include "interface/mmal/util/mmal_util_params.h"
 #include "interface/mmal/util/mmal_default_components.h"
 #include "interface/mmal/util/mmal_connection.h"
+#include "Encoder.h"
 
 #define MMAL_CAMERA_VIDEO_PORT   1
+#define CAMERA_STILLS_WIDTH "camera.stills.width"
+#define CAMERA_STILLS_HEIGHT "camera.stills.height"
+#define CAMERA_STILLS_YUV422 "camera.stills.yuv422"
+#define CAMERA_STILLS_ONE_SHOT "camera.stills.one_shot"
+#define CAMERA_PREVIEW_WIDTH "camera.preview.width"
+#define CAMERA_PREVIEW_HEIGHT "camera.preview.height"
+#define CAMERA_PREVIEW_FRAMES "camera.preview.frames"
+#define CAMERA_STILLS_CAPTURE_CIRCULAR_BUFFER_HEIGHT "camera.stills.capture_circular_buffer_height"
+#define CAMERA_PREVIEW_FAST_RESUME "camera.preview.fast_resume"
 
-using namespace std;
+namespace BerryCam {
 
-class RaspberryPiCamera : public Camera {
+    class RaspberryPiCamera : public Camera {
 
-public:
-    RaspberryPiCamera();
-    ~RaspberryPiCamera() override;
+    public:
+        explicit RaspberryPiCamera(std::shared_ptr<Encoder> encoder);
+        ~RaspberryPiCamera() override;
+        void start() override;
+        void stop() override;
+        void setCameraParameters(boost::property_tree::ptree &ptr) override;
+        boost::property_tree::ptree getCameraParameters() override;
+        static void onFrameReceivedStaticCallback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer);
+        void onFrameReceived(unsigned char *frameData) override;
 
-    void start() override;
-    void stop() override;
+    private:
+        void checkStatus(MMAL_STATUS_T status, std::string description);
+        void setVideoFormat(unsigned int width, unsigned int height);
+        void setCameraVideoPort(unsigned int width, unsigned int height);
 
-    void setCameraParameters(ptree &ptr) override;
-    ptree getCameraParameters() override;
+        MMAL_COMPONENT_T *_camera;
+        MMAL_ES_FORMAT_T *_format;
+        MMAL_PORT_T *_cameraVideoPort;
+        MMAL_POOL_T *_cameraVideoPortPool;
 
-    static void onFrameReceivedStaticCallback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer);
+        std::shared_ptr<Encoder> _encoder;
 
-    void onFrameReceived(unsigned char *frameData) override;
-
-private:
-    void checkStatus(MMAL_STATUS_T status, string description);
-
-
-    MMAL_COMPONENT_T *camera;
-
-    MMAL_ES_FORMAT_T *format;
-    MMAL_STATUS_T status;
-    MMAL_PORT_T *camera_video_port;
-    MMAL_POOL_T *camera_video_port_pool = nullptr;
-
-};
+    };
+}
 
 
 #endif //BERRYCAM_RASPBERRYPICAMERA_H

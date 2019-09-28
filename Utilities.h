@@ -6,12 +6,11 @@
 #define BERRYCAM_UTILITIES_H
 
 #include <boost/property_tree/ptree.hpp>
-using namespace boost::property_tree;
 
 class Utilities {
 public:
     template<class T>
-    static T SafeGet(const std::shared_ptr<ptree>& settings, std::string key, T default_value)
+    static T SafeGet(const std::shared_ptr<boost::property_tree::ptree>& settings, std::string key, T default_value)
     {
         auto iterator = settings->find(key);
         boost::optional<T> value = settings->get_optional<T>(key);
@@ -23,7 +22,7 @@ public:
     }
 
     template<class T>
-    static T SafeGet(ptree& settings, std::string key, T default_value)
+    static T SafeGet(boost::property_tree::ptree& settings, std::string key, T default_value)
     {
         auto iterator = settings.find(key);
         boost::optional<T> value = settings.get_optional<T>(key);

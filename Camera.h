@@ -8,18 +8,17 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
-using namespace std;
-using namespace boost::property_tree;
-
-class Camera {
-public:
-    virtual ~Camera() = 0;
-    virtual void start() = 0;
-    virtual void stop() = 0;
-    virtual void setCameraParameters(ptree &) = 0;
-    virtual ptree getCameraParameters() = 0;
-    virtual void onFrameReceived(unsigned char* frameData) = 0;
-};
+namespace BerryCam {
+    class Camera {
+    public:
+        virtual ~Camera() = 0;
+        virtual void start() = 0;
+        virtual void stop() = 0;
+        virtual void setCameraParameters(boost::property_tree::ptree &) = 0;
+        virtual boost::property_tree::ptree getCameraParameters() = 0;
+        virtual void onFrameReceived(unsigned char *frameData) = 0;
+    };
+}
 
 
 #endif //BERRYCAM_CAMERA_H
