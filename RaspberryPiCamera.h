@@ -20,15 +20,7 @@
 
 
 #define MMAL_CAMERA_VIDEO_PORT   1
-#define CAMERA_STILLS_WIDTH "camera.stills.width"
-#define CAMERA_STILLS_HEIGHT "camera.stills.height"
-#define CAMERA_STILLS_YUV422 "camera.stills.yuv422"
-#define CAMERA_STILLS_ONE_SHOT "camera.stills.one_shot"
-#define CAMERA_PREVIEW_WIDTH "camera.preview.width"
-#define CAMERA_PREVIEW_HEIGHT "camera.preview.height"
-#define CAMERA_PREVIEW_FRAMES "camera.preview.frames"
-#define CAMERA_STILLS_CAPTURE_CIRCULAR_BUFFER_HEIGHT "camera.stills.capture_circular_buffer_height"
-#define CAMERA_PREVIEW_FAST_RESUME "camera.preview.fast_resume"
+
 
 namespace BerryCam {
 

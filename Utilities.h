@@ -7,6 +7,21 @@
 
 #include <boost/property_tree/ptree.hpp>
 
+#define CAMERA_STILLS_WIDTH "camera.stills.width"
+#define CAMERA_STILLS_HEIGHT "camera.stills.height"
+#define CAMERA_STILLS_YUV422 "camera.stills.yuv422"
+#define CAMERA_STILLS_ONE_SHOT "camera.stills.one_shot"
+#define CAMERA_PREVIEW_WIDTH "camera.preview.width"
+#define CAMERA_PREVIEW_HEIGHT "camera.preview.height"
+#define CAMERA_PREVIEW_FRAMES "camera.preview.frames"
+#define CAMERA_STILLS_CAPTURE_CIRCULAR_BUFFER_HEIGHT "camera.stills.capture_circular_buffer_height"
+#define CAMERA_PREVIEW_FAST_RESUME "camera.preview.fast_resume"
+
+#define ENCODER_BIT_RATE "encoder.h264.bit_rate"
+#define ENCODER_FRAME_RATE "encoder.h264.frame_rate"
+#define ENCODER_GOP_SIZE "encoder.h264.gop_size"
+#define MAX_B_FRAMES "encoder.h264.max_b_frames"
+
 class Utilities {
 public:
     template<class T>

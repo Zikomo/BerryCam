@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include "H264Encoder.h"
+#include "Utilities.h"
 
 using namespace boost::property_tree;
 
@@ -42,26 +43,22 @@ BerryCam::H264Encoder::~H264Encoder() {
 }
 
 void BerryCam::H264Encoder::setEncoderParameters(ptree &encoderParameters) {
-
-    uint32_t width = 320;
-    uint32_t height = 240;
-
     /* put sample parameters */
-    _codecContext->bit_rate = 400000;
+    _codecContext->bit_rate = Utilities::SafeGet(encoderParameters, ENCODER_BIT_RATE, 40000);
     /* resolution must be a multiple of two */
-    _codecContext->width = width;
-    _codecContext->height = height;
+    _codecContext->width = Utilities::SafeGet(encoderParameters, CAMERA_STILLS_WIDTH, 320u);
+    _codecContext->height = Utilities::SafeGet(encoderParameters, CAMERA_STILLS_HEIGHT, 240u);;
     /* frames per second */
-    _codecContext->time_base = (AVRational){1, 25};
-    _codecContext->framerate = (AVRational){25, 1};
+    _codecContext->time_base = (AVRational){1, Utilities::SafeGet(encoderParameters, ENCODER_FRAME_RATE, 25)};
+    _codecContext->framerate = (AVRational){Utilities::SafeGet(encoderParameters, ENCODER_FRAME_RATE, 25), 1};
     /* emit one intra frame every ten frames
      * check frame pict_type before passing frame
      * to encoder, if frame->pict_type is AV_PICTURE_TYPE_I
      * then gop_size is ignored and the output of encoder
      * will always be I frame irrespective to gop_size
      */
-    _codecContext->gop_size = 10;
-    _codecContext->max_b_frames = 1;
+    _codecContext->gop_size = Utilities::SafeGet(encoderParameters, ENCODER_GOP_SIZE, 10);
+    _codecContext->max_b_frames =  Utilities::SafeGet(encoderParameters, MAX_B_FRAMES, 1);;
     _codecContext->pix_fmt = AV_PIX_FMT_YUV420P;
     if (_codec->id == AV_CODEC_ID_H264)
         av_opt_set(_codecContext->priv_data, "preset", "slow", 0);
@@ -87,7 +84,6 @@ void BerryCam::H264Encoder::setEncoderParameters(ptree &encoderParameters) {
         errorStream<<"Could not allocate the video frame data"<<std::endl;
         throw std::runtime_error(errorStream.str());
     }
-
 }
 
 boost::property_tree::ptree BerryCam::H264Encoder::getEncoderParameters() {
@@ -101,14 +97,13 @@ void BerryCam::H264Encoder::encode(const void *buffer) {
         errorStream<<"Unable to make frame writable"<<std::endl;
         throw std::runtime_error(errorStream.str());
     }
-
-    std::cout<<"Frame count:"<<_frameCount<<std::endl;
-
+    
     if (buffer != nullptr)
         copyBufferToFrame(buffer);
 
     _frame->pts = _frameCount;
     _frameCount++;
+   
     ret = avcodec_send_frame(_codecContext, buffer != nullptr ? _frame : nullptr);
     if (ret < 0) {
         errorStream<<"Error sending a frame #"<<ret<<std::endl;
@@ -128,19 +123,15 @@ void BerryCam::H264Encoder::encode(const void *buffer) {
             _broadcaster->SendPacket(_tempPacket->data, _tempPacket->size);
         av_packet_unref(_tempPacket);
     }
-
-
 }
 
 void BerryCam::H264Encoder::copyBufferToFrame(const void *buffer) const {
-    int y_size = this->_frame->linesize[0] * this->_codecContext->height;
-    int u_size = this->_frame->linesize[1] * this->_codecContext->height / 2;
-    int v_size = this->_frame->linesize[2] * this->_codecContext->height / 2;
+    int y_size = _frame->linesize[0] * _codecContext->height;
+    int u_size = _frame->linesize[1] * _codecContext->height / 2;
+    int v_size = _frame->linesize[2] * _codecContext->height / 2;
 
-    memcpy(this->_frame->data[0], (unsigned char*)buffer, y_size);
-    memcpy(this->_frame->data[1], (unsigned char*)buffer + y_size, u_size);
-    memcpy(this->_frame->data[2], (unsigned char*)buffer + y_size + u_size, v_size);
-
-
+    memcpy(_frame->data[0], (unsigned char*)buffer, y_size);
+    memcpy(_frame->data[1], (unsigned char*)buffer + y_size, u_size);
+    memcpy(_frame->data[2], (unsigned char*)buffer + y_size + u_size, v_size);
 }
 
