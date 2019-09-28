@@ -145,7 +145,7 @@ int main(int argc, char **argv) {
 
     int ret;
 
-    uint8_t endcode[] = { 0, 0, 1, 0xb7 };
+
 
 
     avcodec_register_all();

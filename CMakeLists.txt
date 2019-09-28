@@ -3,7 +3,7 @@ project(BerryCam)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(BerryCam main.cpp UdpBroadcaster.cpp UdpBroadcaster.h Utilities.cpp Utilities.h Camera.h Encoder.h RaspberryPiCamera.cpp RaspberryPiCamera.h)
+add_executable(BerryCam main.cpp UdpBroadcaster.cpp UdpBroadcaster.h Utilities.cpp Utilities.h Camera.h Encoder.h RaspberryPiCamera.cpp RaspberryPiCamera.h H264Encoder.cpp H264Encoder.h)
 
 find_package(Boost REQUIRED COMPONENTS system)
 
