@@ -13,12 +13,8 @@
 namespace BerryCam {
     class Encoder {
     public:
-        virtual ~Encoder() = 0;
-
-        virtual void setEncoderParameters(std::shared_ptr<boost::property_tree::ptree> encoderParameters) = 0;
-
-        virtual std::shared_ptr<boost::property_tree::ptree> getEncoderParameters() = 0;
-
+        virtual void setEncoderParameters(boost::property_tree::ptree &encoderParameters) = 0;
+        virtual boost::property_tree::ptree getEncoderParameters() = 0;
         virtual void encode(const void *) = 0;
 
     };

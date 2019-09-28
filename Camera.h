@@ -11,7 +11,6 @@
 namespace BerryCam {
     class Camera {
     public:
-        virtual ~Camera() = 0;
         virtual void start() = 0;
         virtual void stop() = 0;
         virtual void setCameraParameters(boost::property_tree::ptree &) = 0;

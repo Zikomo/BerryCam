@@ -17,10 +17,10 @@ extern "C" {
 namespace BerryCam {
     class H264Encoder : public Encoder {
     public:
-        H264Encoder(std::shared_ptr<Broadcaster> broadcaster);
-        ~H264Encoder() override;
-        void setEncoderParameters(std::shared_ptr<boost::property_tree::ptree> encoderParameters) override;
-        std::shared_ptr<boost::property_tree::ptree> getEncoderParameters() override;
+        explicit H264Encoder(std::shared_ptr<Broadcaster> broadcaster);
+        ~H264Encoder();
+        void setEncoderParameters(boost::property_tree::ptree &encoderParameters) override;
+        boost::property_tree::ptree getEncoderParameters() override;
         void encode(const void *pVoid) override;
     private:
         void copyBufferToFrame(const void *buffer) const;

@@ -28,6 +28,7 @@ int main(int argc, char **argv) {
 
     std::shared_ptr<Broadcaster> udpBroadcaster = std::make_shared<UdpBroadcaster>(settings, io_service);
     std::shared_ptr<Encoder> h264Encoder = std::make_shared<H264Encoder>(udpBroadcaster);
+    h264Encoder->setEncoderParameters(settings);
     std::shared_ptr<Camera> raspberryPiCamera = std::make_shared<RaspberryPiCamera>(h264Encoder);
 
     raspberryPiCamera->setCameraParameters(settings);

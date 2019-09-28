@@ -5,6 +5,7 @@
 #include <iostream>
 #include "H264Encoder.h"
 
+using namespace boost::property_tree;
 
 BerryCam::H264Encoder::H264Encoder(std::shared_ptr<Broadcaster> broadcaster) :
         _frameCount(0),
@@ -40,7 +41,7 @@ BerryCam::H264Encoder::~H264Encoder() {
     av_packet_free(&_tempPacket);
 }
 
-void BerryCam::H264Encoder::setEncoderParameters(std::shared_ptr<boost::property_tree::ptree> encoderParameters) {
+void BerryCam::H264Encoder::setEncoderParameters(ptree &encoderParameters) {
 
     uint32_t width = 320;
     uint32_t height = 240;
@@ -89,8 +90,8 @@ void BerryCam::H264Encoder::setEncoderParameters(std::shared_ptr<boost::property
 
 }
 
-std::shared_ptr<boost::property_tree::ptree> BerryCam::H264Encoder::getEncoderParameters() {
-    return std::shared_ptr<boost::property_tree::ptree>();
+boost::property_tree::ptree BerryCam::H264Encoder::getEncoderParameters() {
+    return ptree();
 }
 
 void BerryCam::H264Encoder::encode(const void *buffer) {
@@ -101,11 +102,13 @@ void BerryCam::H264Encoder::encode(const void *buffer) {
         throw std::runtime_error(errorStream.str());
     }
 
+    std::cout<<"Frame count:"<<_frameCount<<std::endl;
 
     if (buffer != nullptr)
         copyBufferToFrame(buffer);
 
-
+    _frame->pts = _frameCount;
+    _frameCount++;
     ret = avcodec_send_frame(_codecContext, buffer != nullptr ? _frame : nullptr);
     if (ret < 0) {
         errorStream<<"Error sending a frame #"<<ret<<std::endl;
@@ -125,7 +128,8 @@ void BerryCam::H264Encoder::encode(const void *buffer) {
             _broadcaster->SendPacket(_tempPacket->data, _tempPacket->size);
         av_packet_unref(_tempPacket);
     }
-    _frameCount++;
+
+
 }
 
 void BerryCam::H264Encoder::copyBufferToFrame(const void *buffer) const {
@@ -137,6 +141,6 @@ void BerryCam::H264Encoder::copyBufferToFrame(const void *buffer) const {
     memcpy(this->_frame->data[1], (unsigned char*)buffer + y_size, u_size);
     memcpy(this->_frame->data[2], (unsigned char*)buffer + y_size + u_size, v_size);
 
-    this->_frame->pts = this->_frameCount;
+
 }
 

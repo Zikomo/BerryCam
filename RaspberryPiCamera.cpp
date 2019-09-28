@@ -137,7 +137,7 @@ void BerryCam::RaspberryPiCamera::onFrameReceivedStaticCallback(MMAL_PORT_T *por
 void BerryCam::RaspberryPiCamera::onFrameReceived(unsigned char *frameData) {
     if ((_encoder == nullptr) || (frameData == nullptr))
         return;
-
+    std::cout<<"Berry Cam Encoding!"<<std::endl;
     _encoder->encode(frameData);
 }
 

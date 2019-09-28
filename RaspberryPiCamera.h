@@ -36,7 +36,7 @@ namespace BerryCam {
 
     public:
         explicit RaspberryPiCamera(std::shared_ptr<Encoder> encoder);
-        ~RaspberryPiCamera() override;
+        ~RaspberryPiCamera();
         void start() override;
         void stop() override;
         void setCameraParameters(boost::property_tree::ptree &ptr) override;

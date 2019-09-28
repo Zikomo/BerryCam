@@ -9,7 +9,6 @@
 namespace BerryCam {
     class Broadcaster {
     public:
-        virtual ~Broadcaster() = 0;
         virtual void SendPacket(unsigned char *data, int size) = 0;
     };
 }
