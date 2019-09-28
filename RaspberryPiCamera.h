@@ -6,6 +6,8 @@
 #define BERRYCAM_RASPBERRYPICAMERA_H
 
 #include "Camera.h"
+#include "Encoder.h"
+
 #include "bcm_host.h"
 #include "interface/mmal/mmal.h"
 #include "interface/mmal/mmal_logging.h"
@@ -15,7 +17,7 @@
 #include "interface/mmal/util/mmal_util_params.h"
 #include "interface/mmal/util/mmal_default_components.h"
 #include "interface/mmal/util/mmal_connection.h"
-#include "Encoder.h"
+
 
 #define MMAL_CAMERA_VIDEO_PORT   1
 #define CAMERA_STILLS_WIDTH "camera.stills.width"

@@ -6,6 +6,7 @@
 #define BERRYCAM_H264ENCODER_H
 
 #include "Encoder.h"
+#include "Broadcaster.h"
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -16,17 +17,20 @@ extern "C" {
 namespace BerryCam {
     class H264Encoder : public Encoder {
     public:
-        H264Encoder();
+        H264Encoder(std::shared_ptr<Broadcaster> broadcaster);
         ~H264Encoder() override;
         void setEncoderParameters(std::shared_ptr<boost::property_tree::ptree> encoderParameters) override;
         std::shared_ptr<boost::property_tree::ptree> getEncoderParameters() override;
         void encode(const void *pVoid) override;
     private:
-        const char  *codec_name;
-        const AVCodec *codec;
-        AVFrame *frame;
-        AVCodecContext *codec_context= nullptr;
-        AVPacket *pkt;
+        void copyBufferToFrame(const void *buffer) const;
+        long _frameCount;
+        const AVCodec *_codec;
+        AVFrame *_frame;
+        AVCodecContext *_codecContext;
+        AVPacket *_tempPacket;
+        std::shared_ptr<Broadcaster> _broadcaster;
+
 
     };
 }
