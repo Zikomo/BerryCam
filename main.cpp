@@ -95,7 +95,6 @@ std::string parseCommandLine(int argc, char *const *argv) {
     variables_map commandLineOptions;
     bool commandLineParsingError = false;
     try {
-        variables_map commandLineOptions;
         store(parse_command_line(argc, argv, optionsDescription), commandLineOptions);
         notify(commandLineOptions);
     }

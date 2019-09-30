@@ -118,14 +118,14 @@ void BerryCam::RaspberryPiCamera::checkStatus(MMAL_STATUS_T status, std::string 
 void BerryCam::RaspberryPiCamera::onFrameReceivedStaticCallback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer) {
     //lock the buffer for use.
     mmal_buffer_header_mem_lock(buffer);
-    RaspberryPiCamera* raspberryPiCamera = reinterpret_cast<RaspberryPiCamera*>(port->userdata);
+    auto * raspberryPiCamera = reinterpret_cast<RaspberryPiCamera*>(port->userdata);
     //Call our local callback
     raspberryPiCamera->onFrameReceived(buffer->data);
     //Release and return the buffer back to the pool
     MMAL_BUFFER_HEADER_T *new_buffer;
     mmal_buffer_header_release(buffer);
     if (port->is_enabled) {
-        MMAL_STATUS_T status;
+        MMAL_STATUS_T status = MMAL_SUCCESS;
         new_buffer = mmal_queue_get(raspberryPiCamera->_cameraVideoPortPool->queue);
         if (new_buffer)
             status = mmal_port_send_buffer(port, new_buffer);

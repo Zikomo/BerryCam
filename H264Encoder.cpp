@@ -126,9 +126,9 @@ void BerryCam::H264Encoder::encode(const void *buffer) {
 }
 
 void BerryCam::H264Encoder::copyBufferToFrame(const void *buffer) const {
-    int y_size = _frame->linesize[0] * _codecContext->height;
-    int u_size = _frame->linesize[1] * _codecContext->height / 2;
-    int v_size = _frame->linesize[2] * _codecContext->height / 2;
+    auto y_size = static_cast<unsigned int>(_frame->linesize[0] * _codecContext->height);
+    auto u_size = static_cast<unsigned int>(_frame->linesize[1] * _codecContext->height / 2);
+    auto v_size = static_cast<unsigned int>(_frame->linesize[2] * _codecContext->height / 2);
 
     memcpy(_frame->data[0], (unsigned char*)buffer, y_size);
     memcpy(_frame->data[1], (unsigned char*)buffer + y_size, u_size);

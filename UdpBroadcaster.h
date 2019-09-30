@@ -23,8 +23,6 @@ class UdpBroadcaster : public Broadcaster {
         void SendPacket(unsigned char *data, int size) override;
 
     private:
-        void OnSent(const boost::system::error_code &error);
-
         boost::property_tree::ptree _settings;
         boost::asio::io_service::strand _strand;
         boost::asio::ip::udp::endpoint _endpoint;

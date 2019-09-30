@@ -23,14 +23,7 @@ BerryCam::UdpBroadcaster::UdpBroadcaster(ptree &settings, boost::asio::io_servic
     cout<<"Broadcasting on: "<<_endpoint.address().to_string()<< " port: " << _endpoint.port()<<endl;
 }
 
-void BerryCam::UdpBroadcaster::OnSent(const boost::system::error_code &error) {
-    if (error) {
-        std::cerr<<"Error sending packet"<<std::endl;
-    }
-    else {
-        std::cout<<"Success"<<std::endl;
-    }
-}
+
 
 void BerryCam::UdpBroadcaster::SendPacket(uint8_t *data, int size) {
     _socket.send_to(boost::asio::buffer(data, static_cast<size_t>(size)), _endpoint);
