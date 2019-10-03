@@ -4,6 +4,7 @@
 #include "H264Encoder.h"
 #include "Camera.h"
 #include "RaspberryPiCamera.h"
+#include "MmalSingleImageEncoder.h"
 
 
 #include <iostream>
@@ -35,9 +36,12 @@ int main(int argc, char **argv) {
     boost::asio::io_service io_service;
     std::shared_ptr<Broadcaster> udpBroadcaster = std::make_shared<UdpBroadcaster>(settings, io_service);
     std::shared_ptr<Encoder> h264Encoder = std::make_shared<H264Encoder>(udpBroadcaster);
+    std::shared_ptr<Encoder> mmalSingleImageEncoder = std::make_shared<MmalSingleImageEncoder>();
     h264Encoder->setEncoderParameters(settings);
+    mmalSingleImageEncoder->setEncoderParameters(settings);
     std::vector<std::shared_ptr<Encoder>> encoders;
     encoders.push_back(h264Encoder);
+    encoders.push_back(mmalSingleImageEncoder);
     std::shared_ptr<Camera> raspberryPiCamera = std::make_shared<RaspberryPiCamera>(encoders);
     raspberryPiCamera->setCameraParameters(settings);
 
