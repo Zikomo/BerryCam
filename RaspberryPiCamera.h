@@ -22,6 +22,7 @@
 #define MMAL_CAMERA_VIDEO_PORT   1
 
 
+
 namespace BerryCam {
 
     class RaspberryPiCamera : public Camera {
@@ -37,9 +38,11 @@ namespace BerryCam {
         void onFrameReceived(unsigned char *frameData) override;
 
     private:
-        void checkStatus(MMAL_STATUS_T status, std::string description);
+        static void checkStatus(MMAL_STATUS_T status, const std::string& description);
         void setVideoFormat(unsigned int width, unsigned int height);
         void setCameraVideoPort(unsigned int width, unsigned int height);
+        void setFlip(boost::property_tree::ptree& cameraParameters);
+        void setRotation(boost::property_tree::ptree& cameraParameters);
 
         MMAL_COMPONENT_T *_camera;
         MMAL_ES_FORMAT_T *_format;

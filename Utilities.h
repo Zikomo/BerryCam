@@ -22,6 +22,10 @@
 #define ENCODER_GOP_SIZE "encoder.h264.gop_size"
 #define MAX_B_FRAMES "encoder.h264.max_b_frames"
 
+#define CAMERA_ROTATION "camera.rotation"
+#define CAMERA_HORIZONTAL_FLIP "camera.preview.horizontal_flip"
+#define CAMERA_VERTICAL_FLIP "camera.preview.vertical_flip"
+
 class Utilities {
 public:
     template<class T>
