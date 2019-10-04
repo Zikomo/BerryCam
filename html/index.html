@@ -1,0 +1,48 @@
+<html>
+
+<head>
+
+<script type="text/JavaScript">
+
+var timeoutPeriod = 1000;
+var imageURI = 'latest_image.jpg';
+var x=0, y=0;
+var img = new Image();
+// For todays date;
+Date.prototype.today = function () {
+    return (((this.getMonth()+1) < 10)?"0":"") + (this.getMonth()+1) +"/"+ ((this.getDate() < 10)?"0":"") + this.getDate() +"/"+ this.getFullYear();
+}
+
+// For the time now
+Date.prototype.timeNow = function () {
+    return ((this.getHours() < 10)?"0":"") + this.getHours() +":"+ ((this.getMinutes() < 10)?"0":"") + this.getMinutes() +":"+ ((this.getSeconds() < 10)?"0":"") + this.getSeconds();
+}
+
+img.onload = function() {
+    var canvas = document.getElementById("BerryCamCanvas");
+    var context = canvas.getContext("2d");
+
+    context.drawImage(img, x, y, 800, 600);
+    context.font = `30px courier`
+    context.fillStyle = "#FFFFFF"
+    context.fillText(new Date().today() + " @ " + new Date().timeNow(), 0, 30 );
+    setTimeout(timedRefresh,timeoutPeriod);
+};
+
+function timedRefresh() {
+    // just change src attribute, will always trigger the onload callback
+    img.src = imageURI + '?d=' + Date.now();
+}
+
+</script>
+
+<title>BerryCam</title>
+
+</head>
+
+<body onload="timedRefresh(1000);">
+
+<canvas id="BerryCamCanvas" width="800" height="600"></canvas>
+
+</body>
+</html>

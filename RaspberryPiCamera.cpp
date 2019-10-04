@@ -3,17 +3,18 @@
 //
 
 #include <iostream>
+#include <utility>
 #include "RaspberryPiCamera.h"
 #include "Utilities.h"
 
 using namespace boost::property_tree;
 
-BerryCam::RaspberryPiCamera::RaspberryPiCamera(std::shared_ptr<Encoder> encoder) :
+BerryCam::RaspberryPiCamera::RaspberryPiCamera(std::vector<std::shared_ptr<Encoder>>  encoders) :
     _camera(nullptr),
     _format(nullptr),
     _cameraVideoPort(nullptr),
     _cameraVideoPortPool(nullptr),
-    _encoder(std::move(encoder)) {
+    _encoders(std::move(encoders)) {
     bcm_host_init();
     checkStatus(mmal_component_create(MMAL_COMPONENT_DEFAULT_CAMERA, &_camera), "mmal_component_create");
     _cameraVideoPort = _camera->output[MMAL_CAMERA_VIDEO_PORT];
@@ -136,9 +137,11 @@ void BerryCam::RaspberryPiCamera::onFrameReceivedStaticCallback(MMAL_PORT_T *por
 }
 
 void BerryCam::RaspberryPiCamera::onFrameReceived(unsigned char *frameData) {
-    if ((_encoder == nullptr) || (frameData == nullptr))
+    if ((_encoders.empty()) || (frameData == nullptr))
         return;
-    _encoder->encode(frameData);
+    for (const auto& encoder : _encoders) {
+        encoder->encode(frameData);
+    }
 }
 
 void BerryCam::RaspberryPiCamera::setFlip(ptree &cameraParameters) {

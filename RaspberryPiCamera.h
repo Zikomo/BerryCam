@@ -28,7 +28,7 @@ namespace BerryCam {
     class RaspberryPiCamera : public Camera {
 
     public:
-        explicit RaspberryPiCamera(std::shared_ptr<Encoder> encoder);
+        explicit RaspberryPiCamera(std::vector<std::shared_ptr<Encoder>> encoders);
         ~RaspberryPiCamera();
         void start() override;
         void stop() override;
@@ -49,7 +49,7 @@ namespace BerryCam {
         MMAL_PORT_T *_cameraVideoPort;
         MMAL_POOL_T *_cameraVideoPortPool;
 
-        std::shared_ptr<Encoder> _encoder;
+        std::vector<std::shared_ptr<Encoder>> _encoders;
 
     };
 }

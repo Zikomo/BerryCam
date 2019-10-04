@@ -6,6 +6,7 @@
 #define BERRYCAM_UTILITIES_H
 
 #include <boost/property_tree/ptree.hpp>
+#include <cmath>
 
 #define CAMERA_STILLS_WIDTH "camera.stills.width"
 #define CAMERA_STILLS_HEIGHT "camera.stills.height"
@@ -26,6 +27,8 @@
 #define CAMERA_HORIZONTAL_FLIP "camera.preview.horizontal_flip"
 #define CAMERA_VERTICAL_FLIP "camera.preview.vertical_flip"
 
+#define WEBSERVER_IMAGE_PATH "webserver.image_path"
+
 class Utilities {
 public:
     template<class T>
@@ -39,7 +42,14 @@ public:
         }
         return settings.get<T>(key);
     }
-
+    template<class T>
+    static T Clamp(double d, T min, T max) {
+        if (d < min)
+            return min;
+        if (d > max)
+            return max;
+        return std::round(d);
+    }
 };
 
 

@@ -10,6 +10,8 @@ add_executable(${PROJECT_NAME}
         H264Encoder.cpp
         H264Encoder.h
         main.cpp
+        MmalSingleImageEncoder.cpp
+        MmalSingleImageEncoder.h
         RaspberryPiCamera.cpp
         RaspberryPiCamera.h
         UdpBroadcaster.cpp
