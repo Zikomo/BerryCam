@@ -26,7 +26,12 @@ BerryCam::UdpBroadcaster::UdpBroadcaster(ptree &settings, boost::asio::io_servic
 
 
 void BerryCam::UdpBroadcaster::SendPacket(uint8_t *data, int size) {
-    _socket.send_to(boost::asio::buffer(data, static_cast<size_t>(size)), _endpoint);
+    try {
+        _socket.send_to(boost::asio::buffer(data, static_cast<size_t>(size)), _endpoint);
+    }
+    catch (exception error) {
+        cerr<<error.what()<<endl;
+    }
 }
 
 
