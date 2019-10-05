@@ -34,23 +34,31 @@ int main(int argc, char **argv) {
 
     //Setting up broadcaster, encoder, and camera
     boost::asio::io_service io_service;
+
     std::shared_ptr<Broadcaster> udpBroadcaster = std::make_shared<UdpBroadcaster>(settings, io_service);
+
+    //Setup encoders
     std::shared_ptr<Encoder> h264Encoder = std::make_shared<H264Encoder>(udpBroadcaster);
     std::shared_ptr<Encoder> mmalSingleImageEncoder = std::make_shared<MmalSingleImageEncoder>();
-    h264Encoder->setEncoderParameters(settings);
-    mmalSingleImageEncoder->setEncoderParameters(settings);
+
+    //Add them to a vector
     std::vector<std::shared_ptr<Encoder>> encoders;
     encoders.push_back(h264Encoder);
     encoders.push_back(mmalSingleImageEncoder);
+
+    //Setup camera with encoders
     std::shared_ptr<Camera> raspberryPiCamera = std::make_shared<RaspberryPiCamera>(encoders);
+
+    //It's important to set the camera parameters first because it also adds critical default values i.e. width & height
     raspberryPiCamera->setCameraParameters(settings);
+    h264Encoder->setEncoderParameters(settings);
+    mmalSingleImageEncoder->setEncoderParameters(settings);
 
     //Start camera
     raspberryPiCamera->start();
 
     //Waiting for operator to enter quit
     waitUntilQuit();
-
 
     //Stop camera and begin shutdown.
     raspberryPiCamera->stop();
@@ -116,7 +124,6 @@ std::string parseCommandLine(int argc, char *const *argv) {
     std::string jsonFileName = "settings.json";
     if (commandLineOptions.count("settings_file")) {
         jsonFileName = commandLineOptions["settings_file"].as<std::string>();
-        std::cout << jsonFileName << std::endl;
     }
 
     return jsonFileName;
