@@ -20,7 +20,7 @@ Currently being developed and tested on a Raspberry Pi 3b+ with the intent to su
 | Raspberry Pi Zero  | Zero | No | N/A
 |   | W/WH | Yes | No
 | Raspberry Pi 3 | B | Yes | No 
-|   | A+ | Yes | No
+|   | A+ | Yes | Yes
 |   | B+ | Yes | Yes
 | Raspberry Pi 4 | B (1GB) | Yes | No
 | Raspberry Pi 4 | B (2GB) | Yes | No
