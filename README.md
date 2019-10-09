@@ -56,6 +56,9 @@ cmake -DCMAKE_BUILD_TYPE=Release ..
 Run make:
 `make`
 
+## Optional nginx webcam server
+
+
 
 
 

@@ -24,20 +24,21 @@ namespace BerryCam {
 
         boost::property_tree::ptree getEncoderParameters() override;
 
-        void encode(const void *pVoid) override;
+        void encode(const void *image) override;
 
     private:
-        MMAL_WRAPPER_T* encoder;
-        MMAL_FOURCC_T encoding;
+        MMAL_WRAPPER_T* _encoder;
+        MMAL_FOURCC_T _encoding;
         int _frameCount;
-        MMAL_PORT_T* portIn;
-        MMAL_PORT_T* portOut;
-        MMAL_BUFFER_HEADER_T* in;
-        MMAL_BUFFER_HEADER_T* out;
-        MMAL_STATUS_T status;
-        std::string filename;
-        unsigned int width;
-        unsigned int height;
+        MMAL_PORT_T* _portIn;
+        MMAL_PORT_T* _portOut;
+        MMAL_BUFFER_HEADER_T* _input;
+        MMAL_BUFFER_HEADER_T* _output;
+        MMAL_STATUS_T _status;
+        std::string _filename;
+        unsigned int _width;
+        unsigned int _height;
+        int _targetFramesPerSecond;
 
     };
 }
