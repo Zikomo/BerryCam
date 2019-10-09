@@ -56,7 +56,26 @@ cmake -DCMAKE_BUILD_TYPE=Release ..
 Run make:
 `make`
 
-## Optional nginx webcam server
+## Optional: Run BerryCam as a service
+`sudo nano /lib/systemd/system/berrycam.service`
+
+Then use the following as a template but note that you need to replace everything in between < > with the path to this
+repository on your system.
+
+```
+[Unit]
+Description=BerryCam
+After=network-online.target
+
+[Service]
+ExecStart=<Insert the path to where you cloned this repository>/BerryCam/Release/BerryCam --settings <Insert the path to where you cloned this repository>/BerryCam/Release/settings.json
+
+[Install]
+WantedBy=network-online.target
+```
+
+## Optional: Using nginx as a webcam server
+
 
 
 
