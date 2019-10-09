@@ -28,7 +28,7 @@
 #define CAMERA_VERTICAL_FLIP "camera.preview.vertical_flip"
 
 #define SINGLE_IMAGE_ENCODER_IMAGE_PATH "single_image_encoder.image_path"
-#define SINGLE_IMAGE_ENCODER_TARGET_FRAMES_PER_SECOND "single_image_encoder_target_fps"
+#define SINGLE_IMAGE_ENCODER_TARGET_FRAMES_PER_SECOND "single_image_encoder.target_fps"
 
 class Utilities {
 public:
