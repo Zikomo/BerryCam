@@ -60,21 +60,42 @@ Run make:
 `sudo nano /lib/systemd/system/berrycam.service`
 
 Then use the following as a template but note that you need to replace everything in between < > with the path to this
-repository on your system.
+repository on your system:
 
 ```
 [Unit]
 Description=BerryCam
-After=network-online.target
+After=multi-user.target
 
 [Service]
 ExecStart=<Insert the path to where you cloned this repository>/BerryCam/Release/BerryCam --settings <Insert the path to where you cloned this repository>/BerryCam/Release/settings.json
 
 [Install]
-WantedBy=network-online.target
+WantedBy=multi-user.target
+```
+The reload systemctl:
+
+`sudo systemctl daemon-reload`
+
+Then enable the BerryCam service:
+
+`sudo systemctl enable berrycam.service`
+
+And reboot your Raspberry Pi:
+
+`sudo reboot now`
+
+## Optional: Using nginx as a webcam server:
+
+```
+sudo apt-get update
+sudo apt-get install nginx
 ```
 
-## Optional: Using nginx as a webcam server
+Then from your BerryCam repository: 
+
+`sudo cp html/index.html /var/www/html/`
+
 
 
 
