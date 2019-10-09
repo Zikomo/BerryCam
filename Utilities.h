@@ -27,7 +27,8 @@
 #define CAMERA_HORIZONTAL_FLIP "camera.preview.horizontal_flip"
 #define CAMERA_VERTICAL_FLIP "camera.preview.vertical_flip"
 
-#define WEBSERVER_IMAGE_PATH "webserver.image_path"
+#define SINGLE_IMAGE_ENCODER_IMAGE_PATH "single_image_encoder.image_path"
+#define SINGLE_IMAGE_ENCODER_TARGET_FRAMES_PER_SECOND "single_image_encoder.target_fps"
 
 class Utilities {
 public:
