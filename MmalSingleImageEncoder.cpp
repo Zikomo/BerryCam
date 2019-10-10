@@ -5,6 +5,39 @@
 #include "MmalSingleImageEncoder.h"
 #include "Utilities.h"
 
+BerryCam::MmalSingleImageEncoder::MmalSingleImageEncoder() :
+        _encoder(nullptr),
+        _encoding(MMAL_ENCODING_JPEG),
+        _frameCount(0),
+        _portIn(nullptr),
+        _portOut(nullptr),
+        _input(nullptr),
+        _output(nullptr),
+        _status(MMAL_SUCCESS),
+        _filename(""),
+        _width(0),
+        _height(0),
+        _targetFramesPerSecond(0)
+{
+    if (mmal_wrapper_create(&_encoder, MMAL_COMPONENT_DEFAULT_IMAGE_ENCODER)
+        != MMAL_SUCCESS) {
+        fprintf(stderr, "Failed to create mmal component\n");
+        exit(1);
+    }
+
+    _portIn = _encoder->input[0];
+    _encoder->status = MMAL_SUCCESS;
+
+    if (_portIn->is_enabled) {
+        if (mmal_wrapper_port_disable(_portIn) != MMAL_SUCCESS) {
+            fprintf(stderr, "Failed to disable input port\n");
+            exit(1);
+        }
+    }
+}
+
+BerryCam::MmalSingleImageEncoder::~MmalSingleImageEncoder() = default;
+
 void BerryCam::MmalSingleImageEncoder::setEncoderParameters(boost::property_tree::ptree &encoderParameters) {
     _width = encoderParameters.get<unsigned int>(CAMERA_PREVIEW_WIDTH);//Utilities::SafeGet(encoderParameters, CAMERA_PREVIEW_WIDTH, 320u);
     _height = encoderParameters.get<unsigned int>(CAMERA_PREVIEW_HEIGHT);
@@ -114,9 +147,9 @@ void BerryCam::MmalSingleImageEncoder::encode(const void *image) {
             //memcpy(in->data, rgba, in->alloc_size);
             unsigned char* rgba = _input->data;
             auto* yuv = reinterpret_cast<const unsigned char*>(image);
-            int total = _width * _height, y = 0, u = 0 , v = 0;
-            for (int column = 0; column < _height; column++) {
-                for (int x = 0; x < _width; x++) {
+            unsigned int total = _width * _height, y = 0, u = 0 , v = 0;
+            for (unsigned int column = 0; column < _height; column++) {
+                for (unsigned int x = 0; x < _width; x++) {
                     y = yuv[column * _width + x];
                     u = yuv[(column / 2) * (_width / 2) + (x / 2) + total];
                     v = yuv[(column / 2) * (_width / 2) + (x / 2) + total + (total / 4)];
@@ -165,29 +198,5 @@ void BerryCam::MmalSingleImageEncoder::encode(const void *image) {
 
     fclose(outFile);
     printf("- written %u bytes to %s\n\n", outputWritten, _filename.c_str());
-
-}
-
-BerryCam::MmalSingleImageEncoder::MmalSingleImageEncoder() :
-        _frameCount(0) {
-    if (mmal_wrapper_create(&_encoder, MMAL_COMPONENT_DEFAULT_IMAGE_ENCODER)
-        != MMAL_SUCCESS) {
-        fprintf(stderr, "Failed to create mmal component\n");
-        exit(1);
-    }
-    _encoding = MMAL_ENCODING_JPEG;
-
-    _portIn = _encoder->input[0];
-    _encoder->status = MMAL_SUCCESS;
-
-    if (_portIn->is_enabled) {
-        if (mmal_wrapper_port_disable(_portIn) != MMAL_SUCCESS) {
-            fprintf(stderr, "Failed to disable input port\n");
-            exit(1);
-        }
-    }
-}
-
-BerryCam::MmalSingleImageEncoder::~MmalSingleImageEncoder() {
 
 }
