@@ -40,6 +40,10 @@ Boost:
 `sudo apt-get install libboost-system-dev`
 `sudo apt-get install libboost-program-options-dev`
 
+ALSA:
+
+`sudo apt-get install libasound2-dev`
+
 
 ## Building
 Clone this repository:
