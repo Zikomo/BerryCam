@@ -4,14 +4,15 @@ project(BerryCam)
 set(CMAKE_CXX_STANDARD 14)
 
 add_executable(${PROJECT_NAME}
+        AudioCaptureDevice.h
         Broadcaster.h
         Camera.h
         Encoder.h
         H264Encoder.cpp
         H264Encoder.h
         main.cpp
-        MicrophoneRecorder.cpp
-        MicrophoneRecorder.h
+        AlsaAudioCaptureDevice.cpp
+        AlsaAudioCaptureDevice.h
         MmalSingleImageEncoder.cpp
         MmalSingleImageEncoder.h
         RaspberryPiCamera.cpp

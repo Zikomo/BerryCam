@@ -5,6 +5,8 @@
 #include "Camera.h"
 #include "RaspberryPiCamera.h"
 #include "MmalSingleImageEncoder.h"
+#include "AudioCaptureDevice.h"
+#include "AlsaAudioCaptureDevice.h"
 
 
 #include <iostream>
@@ -26,14 +28,16 @@ void waitUntilQuit();
 void saveJsonSettings(std::string &jsonFileName, const ptree &settings);
 
 int main(int argc, char **argv) {
+
     //First parse the command line options
     std::string jsonFileName = parseCommandLine(argc, argv);
 
     //Loading the JSON settings
     ptree settings = getJsonSettings(jsonFileName);
+    //Init io_service
+    boost::asio::io_service io_service;
 
     //Setting up broadcaster, encoder, and camera
-    boost::asio::io_service io_service;
 
     std::shared_ptr<Broadcaster> udpBroadcaster = std::make_shared<UdpBroadcaster>(settings, io_service);
 
@@ -48,6 +52,8 @@ int main(int argc, char **argv) {
 
     //Setup camera with encoders
     std::shared_ptr<Camera> raspberryPiCamera = std::make_shared<RaspberryPiCamera>(encoders);
+    //Setup audio recording
+    std::shared_ptr<AudioCaptureDevice> audioCaptureDevice = std::make_shared<AlsaAudioCaptureDevice>();
 
     //It's important to set the camera parameters first because it also adds critical default values i.e. width & height
     raspberryPiCamera->setCameraParameters(settings);
