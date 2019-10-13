@@ -2,10 +2,14 @@
 // Created by Zikomo Fields on 10/10/19.
 //
 
+#include <future>
 #include "AlsaAudioCaptureDevice.h"
+
+using namespace std::chrono_literals;
 
 void BerryCam::AlsaAudioCaptureDevice::start() {
 
+    captureThread = std::thread(&AlsaAudioCaptureDevice::captureThreadWorker, this);
 //    while (loops > 0) {
 //        loops--;
 //        rc = snd_pcm_readi(handle, buffer, frames);
@@ -29,6 +33,8 @@ void BerryCam::AlsaAudioCaptureDevice::start() {
 }
 
 void BerryCam::AlsaAudioCaptureDevice::stop() {
+    shutDownPromise.set_value(true);
+    captureThread.join();
 
 }
 
@@ -68,7 +74,7 @@ BerryCam::AlsaAudioCaptureDevice::AlsaAudioCaptureDevice() {
                                  SND_PCM_FORMAT_S16_LE);
 
     /* Two channels (stereo) */
-    snd_pcm_hw_params_set_channels(handle, params, 2);
+    snd_pcm_hw_params_set_channels(handle, params, 1);
 
     /* 44100 bits/second sampling rate (CD quality) */
     val = 44100;
@@ -92,7 +98,7 @@ BerryCam::AlsaAudioCaptureDevice::AlsaAudioCaptureDevice() {
     /* Use a buffer large enough to hold one period */
     snd_pcm_hw_params_get_period_size(params,
                                       &frames, &dir);
-    size = frames * 4; /* 2 bytes/sample, 2 channels */
+    size = frames * 2; /* 2 bytes/sample, 2 channels */
     buffer = (char *) malloc(size);
     /* We want to loop for 5 seconds */
     snd_pcm_hw_params_get_period_time(params,
@@ -103,4 +109,27 @@ BerryCam::AlsaAudioCaptureDevice::~AlsaAudioCaptureDevice() {
     snd_pcm_drain(handle);
     snd_pcm_close(handle);
     free(buffer);
+}
+
+void BerryCam::AlsaAudioCaptureDevice::captureThreadWorker() {
+    std::future<bool> shutDownStatus = shutDownPromise.get_future();
+    while (shutDownStatus.wait_for(0ms) != std::future_status::ready) {
+
+        rc = snd_pcm_readi(handle, buffer, frames);
+        if (rc == -EPIPE) {
+            /* EPIPE means overrun */
+            fprintf(stderr, "overrun occurred\n");
+            snd_pcm_prepare(handle);
+        } else if (rc < 0) {
+            fprintf(stderr,
+                    "error from read: %s\n",
+                    snd_strerror(rc));
+        } else if (rc != (int)frames) {
+            fprintf(stderr, "short read, read %d frames\n", rc);
+        }
+        //rc = write(1, buffer, size);
+        if (rc != size)
+            fprintf(stderr,
+                    "short write: wrote %d bytes\n", rc);
+    }
 }

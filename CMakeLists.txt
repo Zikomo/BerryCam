@@ -27,16 +27,26 @@ find_package(ALSA REQUIRED)
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 include_directories(/opt/vc/include/)
-FIND_LIBRARY(avcodec_LIBS avcodec)
-FIND_LIBRARY(avutil_LIBS NAMES avutil)
+FIND_LIBRARY(FFMPEG_AVCODEC REQUIRED  avcodec)
+FIND_LIBRARY(FFMPEG_AVUTIL  REQUIRED avutil)
 FIND_LIBRARY(bcm_host_LIBS NAMES bcm_host PATHS /opt/vc/lib)
 FIND_LIBRARY(mmalcore_LIBS NAMES mmal_core PATHS /opt/vc/lib)
 FIND_LIBRARY(mmalutil_LIBS NAMES mmal_util PATHS /opt/vc/lib)
 FIND_LIBRARY(mmal_LIBS NAMES mmal PATHS /opt/vc/lib)
-link_directories( ${Boost_LIBRARY_DIRS})
+
+INCLUDE_DIRECTORIES(
+        ${FFMPEG_AVCODEC_INCLUDE_DIRS}
+        ${FFMPEG_AVUTIL_INCLUDE_DIRS}
+        ${Boost_INCLUDE_DIRS}
+)
+LINK_DIRECTORIES(
+        ${FFMPEG_AVCODEC_LIBRARY_DIRS}
+        ${FFMPEG_AVUTIL_LIBRARY_DIRS}
+        ${Boost_LIBRARY_DIRS}
+)
 target_link_libraries(${PROJECT_NAME}
-        ${avcodec_LIBS}
-        ${avutil_LIBS}
+        ${FFMPEG_AVCODEC}
+        ${FFMPEG_AVUTIL}
         ${ALSA_LIBRARY}
         ${bcm_host_LIBS}
         ${Boost_LIBRARIES}

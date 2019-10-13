@@ -25,6 +25,7 @@ namespace BerryCam {
         boost::property_tree::ptree getAudioCaptureParameters() override;
 
     private:
+        void captureThreadWorker();
         long loops{};
         int rc{};
         int size{};
@@ -34,6 +35,8 @@ namespace BerryCam {
         int dir{};
         snd_pcm_uframes_t frames{};
         char *buffer{};
+        std::promise<bool> shutDownPromise{};
+        std::thread captureThread{};
 
     };
 }
