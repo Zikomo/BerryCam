@@ -17,7 +17,7 @@ BerryCam::H264Encoder::H264Encoder(std::shared_ptr<Broadcaster> broadcaster) :
         _broadcaster(std::move(broadcaster)) {
     avcodec_register_all();
     std::stringstream errorString;
-    _codec = avcodec_find_encoder(AV_CODEC_ID_H264);
+    _codec = avcodec_find_encoder_by_name("h264_omx");//avcodec_find_encoder(AV_CODEC_ID_H264);
     if (!_codec) {
         errorString<<"Codec "<<AV_CODEC_ID_H264<<" not found. "<<std::endl;
         throw std::runtime_error(errorString.str());
@@ -44,13 +44,14 @@ BerryCam::H264Encoder::~H264Encoder() {
 
 void BerryCam::H264Encoder::setEncoderParameters(ptree &encoderParameters) {
     /* put sample parameters */
-    _codecContext->bit_rate = Utilities::SafeGet(encoderParameters, ENCODER_BIT_RATE, 40000);
+    _codecContext->bit_rate = Utilities::SafeGet(encoderParameters, ENCODER_BIT_RATE, 4000000);
     /* resolution must be a multiple of two */
-    _codecContext->width = Utilities::SafeGet(encoderParameters, CAMERA_STILLS_WIDTH, 320u);
-    _codecContext->height = Utilities::SafeGet(encoderParameters, CAMERA_STILLS_HEIGHT, 240u);;
+    _codecContext->width = Utilities::SafeGet(encoderParameters, CAMERA_PREVIEW_WIDTH, 1024u);
+    _codecContext->height = Utilities::SafeGet(encoderParameters, CAMERA_PREVIEW_HEIGHT, 768u);;
     /* frames per second */
     _codecContext->time_base = (AVRational){1, Utilities::SafeGet(encoderParameters, ENCODER_FRAME_RATE, 25)};
     _codecContext->framerate = (AVRational){Utilities::SafeGet(encoderParameters, ENCODER_FRAME_RATE, 25), 1};
+    _codecContext->level = 32;
     /* emit one intra frame every ten frames
      * check frame pict_type before passing frame
      * to encoder, if frame->pict_type is AV_PICTURE_TYPE_I
@@ -60,8 +61,8 @@ void BerryCam::H264Encoder::setEncoderParameters(ptree &encoderParameters) {
     _codecContext->gop_size = Utilities::SafeGet(encoderParameters, ENCODER_GOP_SIZE, 10);
     _codecContext->max_b_frames =  Utilities::SafeGet(encoderParameters, MAX_B_FRAMES, 1);;
     _codecContext->pix_fmt = AV_PIX_FMT_YUV420P;
-    if (_codec->id == AV_CODEC_ID_H264)
-        av_opt_set(_codecContext->priv_data, "preset", "slow", 0);
+
+    av_opt_set(_codecContext->priv_data, "preset", "slow", 0);
     /* open it */
     int ret = avcodec_open2(_codecContext, _codec, nullptr);
     std::stringstream errorStream;
@@ -103,7 +104,8 @@ void BerryCam::H264Encoder::encode(const void *buffer) {
 
     _frame->pts = _frameCount;
     _frameCount++;
-   
+
+
     ret = avcodec_send_frame(_codecContext, buffer != nullptr ? _frame : nullptr);
     if (ret < 0) {
         errorStream<<"Error sending a frame #"<<ret<<std::endl;
@@ -112,15 +114,23 @@ void BerryCam::H264Encoder::encode(const void *buffer) {
 
     while (ret >= 0) {
         ret = avcodec_receive_packet(_codecContext, _tempPacket);
+
         if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
             return;
         else if (ret < 0) {
             fprintf(stderr, "Error during encoding\n");
             exit(1);
         }
+        if (_frameCount == 1) {
+            std::cout<<"Check em: "<<_tempPacket->size<<std::endl;
+            _ppsFrameStore = std::vector<unsigned char>(_tempPacket->size);
+            memcpy(&_ppsFrameStore[0], _tempPacket->data, _tempPacket->size);
+        }
 
         if (_broadcaster != nullptr)
             _broadcaster->SendPacket(_tempPacket->data, _tempPacket->size);
+        if ((_frameCount % 30) == 0)
+            _broadcaster->SendPacket(&_ppsFrameStore[0], _ppsFrameStore.size());
         av_packet_unref(_tempPacket);
     }
 }

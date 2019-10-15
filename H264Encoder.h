@@ -29,6 +29,7 @@ namespace BerryCam {
         AVFrame *_frame;
         AVCodecContext *_codecContext;
         AVPacket *_tempPacket;
+        std::vector<unsigned char> _ppsFrameStore;
         std::shared_ptr<Broadcaster> _broadcaster;
 
 
