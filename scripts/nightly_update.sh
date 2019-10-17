@@ -3,7 +3,7 @@ cd "$BERRYCAM_ROOT" || exit
 cp Release/settings.json temp
 rm -rf Release
 git fetch
-get checkout master
+git checkout master
 git pull
 mkdir Release
 cd Release || exit
