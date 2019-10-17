@@ -147,17 +147,21 @@ void BerryCam::MmalSingleImageEncoder::encode(const void *image) {
             //memcpy(in->data, rgba, in->alloc_size);
             unsigned char* rgba = _input->data;
             auto* yuv = reinterpret_cast<const unsigned char*>(image);
-            unsigned int total = _width * _height, y = 0, u = 0 , v = 0;
+            unsigned int total = _width * _height;
+            unsigned char y = 0, u = 0 , v = 0, r = 0, g = 0, b = 0, a = 0;
             for (unsigned int column = 0; column < _height; column++) {
                 for (unsigned int x = 0; x < _width; x++) {
                     y = yuv[column * _width + x];
                     u = yuv[(column / 2) * (_width / 2) + (x / 2) + total];
                     v = yuv[(column / 2) * (_width / 2) + (x / 2) + total + (total / 4)];
-                    *(rgba++) = Utilities::Clamp(y + (1.732446 * (u-128)), 0, 0xFF);
-                    *(rgba++) = Utilities::Clamp(y - (0.698001 * (v-128)) - (0.337633 * (u-128)), 0, 0xFF);
-                    *(rgba++) = Utilities::Clamp(y +  (1.370705 * (v-128)), 0, 0xFF);
-                    *(rgba++) = 0xFF;
-
+                    r = Utilities::Clamp(y + (1.370705 * (v-128)), 0, 0xFF);
+                    g = Utilities::Clamp(y - (0.698001 * (v-128)) - (0.337633 * (u-128)), 0, 0xFF);
+                    b = Utilities::Clamp(y + (1.732446 * (u-128)), 0, 0xFF);
+                    a = 0xFF;
+                    *(rgba++) = b;
+                    *(rgba++) = g;
+                    *(rgba++) = r;
+                    *(rgba++) = a;
                 }
             }
             _input->length = _input->alloc_size;
