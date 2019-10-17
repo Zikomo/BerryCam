@@ -153,11 +153,11 @@ void BerryCam::MmalSingleImageEncoder::encode(const void *image) {
                     y = yuv[column * _width + x];
                     u = yuv[(column / 2) * (_width / 2) + (x / 2) + total];
                     v = yuv[(column / 2) * (_width / 2) + (x / 2) + total + (total / 4)];
-                    *(rgba++) = Utilities::Clamp(y + (1.732446 * (u-128)), 0, 0xFF);
-                    *(rgba++) = Utilities::Clamp(y - (0.698001 * (v-128)) - (0.337633 * (u-128)), 0, 0xFF);
+                    //UV420toRGB888(y, u, v);
                     *(rgba++) = Utilities::Clamp(y +  (1.370705 * (v-128)), 0, 0xFF);
+                    *(rgba++) = Utilities::Clamp(y - (0.698001 * (v-128)) - (0.337633 * (u-128)), 0, 0xFF);
+                    *(rgba++) =  Utilities::Clamp(y + (1.732446 * (u-128)), 0, 0xFF);
                     *(rgba++) = 0xFF;
-
                 }
             }
             _input->length = _input->alloc_size;
