@@ -18,10 +18,7 @@
 #include "interface/mmal/util/mmal_default_components.h"
 #include "interface/mmal/util/mmal_connection.h"
 
-
 #define MMAL_CAMERA_VIDEO_PORT   1
-
-
 
 namespace BerryCam {
 

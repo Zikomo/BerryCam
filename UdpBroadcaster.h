@@ -6,6 +6,8 @@
 #define BERRYCAM_UDPBROADCASTER_H
 
 
+
+
 #include "Broadcaster.h"
 
 #include <boost/asio.hpp>
@@ -20,13 +22,15 @@ class UdpBroadcaster : public Broadcaster {
         explicit UdpBroadcaster(boost::property_tree::ptree &settings,
                                 boost::asio::io_service &io_service);
 
-        void SendPacket(unsigned char *data, int size) override;
+        void SendPacket(unsigned char *data, unsigned int size) override;
 
     private:
         boost::property_tree::ptree _settings;
         boost::asio::io_service::strand _strand;
         boost::asio::ip::udp::endpoint _endpoint;
         boost::asio::ip::udp::socket _socket;
+
+        unsigned int _maxMtuSize;
     };
 
 }
