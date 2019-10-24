@@ -15,7 +15,6 @@ BerryCam::H264Encoder::H264Encoder(std::shared_ptr<Broadcaster> broadcaster) :
         _codecContext(nullptr),
         _tempPacket(nullptr),
         _broadcaster(std::move(broadcaster)) {
-    avcodec_register_all();
     std::stringstream errorString;
     _codec = avcodec_find_encoder_by_name("h264_omx");//avcodec_find_encoder(AV_CODEC_ID_H264);
     if (!_codec) {
@@ -44,22 +43,22 @@ BerryCam::H264Encoder::~H264Encoder() {
 
 void BerryCam::H264Encoder::setEncoderParameters(ptree &encoderParameters) {
     /* put sample parameters */
-    _codecContext->bit_rate = Utilities::SafeGet(encoderParameters, ENCODER_BIT_RATE, 4000000);
+    _codecContext->bit_rate = Utilities::SafeGet(encoderParameters, ENCODER_BIT_RATE, DEFAULT_ENCODER_BITRATE);
     /* resolution must be a multiple of two */
-    _codecContext->width = Utilities::SafeGet(encoderParameters, CAMERA_PREVIEW_WIDTH, 1024u);
-    _codecContext->height = Utilities::SafeGet(encoderParameters, CAMERA_PREVIEW_HEIGHT, 768u);;
+    _codecContext->width = Utilities::SafeGet(encoderParameters, CAMERA_PREVIEW_WIDTH, DEFAULT_CAMERA_RESOLUTION_WIDTH);
+    _codecContext->height = Utilities::SafeGet(encoderParameters, CAMERA_PREVIEW_HEIGHT, DEFAULT_CAMERA_RESOLUTION_HEIGHT);
     /* frames per second */
-    _codecContext->time_base = (AVRational){1, Utilities::SafeGet(encoderParameters, ENCODER_FRAME_RATE, 25)};
-    _codecContext->framerate = (AVRational){Utilities::SafeGet(encoderParameters, ENCODER_FRAME_RATE, 25), 1};
-    _codecContext->level = 32;
+    _codecContext->time_base = (AVRational){1, Utilities::SafeGet(encoderParameters, ENCODER_FRAME_RATE, DEFAULT_ENCODER_TARGET_FRAMES_PER_SECOND)};
+    _codecContext->framerate = (AVRational){Utilities::SafeGet(encoderParameters, ENCODER_FRAME_RATE, DEFAULT_ENCODER_TARGET_FRAMES_PER_SECOND), 1};
+    
     /* emit one intra frame every ten frames
      * check frame pict_type before passing frame
      * to encoder, if frame->pict_type is AV_PICTURE_TYPE_I
      * then gop_size is ignored and the output of encoder
      * will always be I frame irrespective to gop_size
      */
-    _codecContext->gop_size = Utilities::SafeGet(encoderParameters, ENCODER_GOP_SIZE, 10);
-    _codecContext->max_b_frames =  Utilities::SafeGet(encoderParameters, MAX_B_FRAMES, 1);;
+    _codecContext->gop_size = Utilities::SafeGet(encoderParameters, ENCODER_GOP_SIZE, DEFAULT_ENCODER_GOP_SIZE);
+    _codecContext->max_b_frames =  Utilities::SafeGet(encoderParameters, ENCODER_MAX_B_FRAMES, DEFAULT_ENCODER_MAX_B_FRAMES);
     _codecContext->pix_fmt = AV_PIX_FMT_YUV420P;
 
     av_opt_set(_codecContext->priv_data, "preset", "slow", 0);

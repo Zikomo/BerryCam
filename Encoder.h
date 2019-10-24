@@ -8,15 +8,12 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
-
-
 namespace BerryCam {
     class Encoder {
     public:
         virtual void setEncoderParameters(boost::property_tree::ptree &encoderParameters) = 0;
         virtual boost::property_tree::ptree getEncoderParameters() = 0;
         virtual void encode(const void *) = 0;
-
     };
 }
 

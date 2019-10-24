@@ -1,4 +1,3 @@
-#include <utility>
 #include <iostream>
 
 //
@@ -17,15 +16,13 @@ using namespace boost::property_tree;
 BerryCam::UdpBroadcaster::UdpBroadcaster(ptree &settings, boost::asio::io_service &io_service)
     : _strand(io_service),
       _settings(settings),
-      _endpoint(address_v4::from_string(Utilities::SafeGet(_settings, "socket.broadcast.address", std::string("239.255.0.1"))),
-              Utilities::SafeGet(_settings, "socket.broadcast.port", (unsigned short)9999)),
+      _endpoint(address_v4::from_string(Utilities::SafeGet(_settings, UDP_BROADCAST_ADDRESS, std::string(DEFAULT_BROADCAST_ADDRESS))),
+              Utilities::SafeGet(_settings, UDP_BROADCAST_PORT, (unsigned short)DEFAULT_BROADCAST_PORT)),
       _socket(_strand.get_io_service(), _endpoint.protocol()),
-      _maxMtuSize(Utilities::SafeGet(_settings, "socket.broadcast.max_mtu_size", 1450u))
+      _maxMtuSize(Utilities::SafeGet(_settings, UDP_BROADCAST_MTU, DEFAULT_BROADCAST_MTU))
 {
     cout<<"Broadcasting on: "<<_endpoint.address().to_string()<< " port: " << _endpoint.port()<<endl;
 }
-
-
 
 void BerryCam::UdpBroadcaster::SendPacket(uint8_t *data, unsigned int size) {
     try {
@@ -43,7 +40,6 @@ void BerryCam::UdpBroadcaster::SendPacket(uint8_t *data, unsigned int size) {
         if (lastPosition < size) {
             _socket.send_to(boost::asio::buffer(data + lastPosition, static_cast<size_t>(size - lastPosition)), _endpoint);
         }
-
     }
     catch (std::runtime_error& error) {
         cerr<<error.what()<<endl;

@@ -31,7 +31,7 @@ void BerryCam::RaspberryPiCamera::start() {
     checkStatus(mmal_port_enable(_cameraVideoPort, onFrameReceivedStaticCallback), "mmal_port_enable");
     checkStatus(mmal_component_enable(_camera), "mmal_component_enable");
     unsigned int queueLength = mmal_queue_length(_cameraVideoPortPool->queue);
-    for (int i = 0; i < queueLength; i++) {
+    for (unsigned int i = 0; i < queueLength; i++) {
         MMAL_BUFFER_HEADER_T *buffer = mmal_queue_get(_cameraVideoPortPool->queue);
         if (!buffer) {
             std::cout << "Unable to get a required buffer " << i << " from pool queue" << std::endl;
@@ -51,15 +51,15 @@ void BerryCam::RaspberryPiCamera::stop() {
 void BerryCam::RaspberryPiCamera::setCameraParameters(ptree &cameraParameters) {
     MMAL_PARAMETER_CAMERA_CONFIG_T camConfig = {
             { MMAL_PARAMETER_CAMERA_CONFIG, sizeof (camConfig)},
-            Utilities::SafeGet(cameraParameters, CAMERA_STILLS_WIDTH, 320u),
-            Utilities::SafeGet(cameraParameters, CAMERA_STILLS_HEIGHT, 240u),
-            Utilities::SafeGet(cameraParameters, CAMERA_STILLS_YUV422, 0u),
-            Utilities::SafeGet(cameraParameters, CAMERA_STILLS_ONE_SHOT,0u),
-            Utilities::SafeGet(cameraParameters, CAMERA_PREVIEW_WIDTH, 1024u),
-            Utilities::SafeGet(cameraParameters, CAMERA_PREVIEW_HEIGHT, 768u),
-            Utilities::SafeGet(cameraParameters, CAMERA_PREVIEW_FRAMES, 3u),
-            Utilities::SafeGet(cameraParameters, CAMERA_STILLS_CAPTURE_CIRCULAR_BUFFER_HEIGHT, 0u),
-            Utilities::SafeGet(cameraParameters, CAMERA_PREVIEW_FAST_RESUME, 1u),
+            Utilities::SafeGet(cameraParameters, CAMERA_STILLS_WIDTH, DEFAULT_CAMERA_RESOLUTION_WIDTH),
+            Utilities::SafeGet(cameraParameters, CAMERA_STILLS_HEIGHT, DEFAULT_CAMERA_RESOLUTION_HEIGHT),
+            Utilities::SafeGet(cameraParameters, CAMERA_STILLS_YUV422, DEFAULT_FALSE),
+            Utilities::SafeGet(cameraParameters, CAMERA_STILLS_ONE_SHOT,DEFAULT_FALSE),
+            Utilities::SafeGet(cameraParameters, CAMERA_PREVIEW_WIDTH, DEFAULT_CAMERA_RESOLUTION_WIDTH),
+            Utilities::SafeGet(cameraParameters, CAMERA_PREVIEW_HEIGHT, DEFAULT_CAMERA_RESOLUTION_HEIGHT),
+            Utilities::SafeGet(cameraParameters, CAMERA_PREVIEW_FRAMES, DEFAULT_CAMERA_PREVIEW_FRAMES),
+            Utilities::SafeGet(cameraParameters, CAMERA_STILLS_CAPTURE_CIRCULAR_BUFFER_HEIGHT, DEFAULT_FALSE),
+            Utilities::SafeGet(cameraParameters, CAMERA_PREVIEW_FAST_RESUME, DEFAULT_TRUE),
             MMAL_PARAM_TIMESTAMP_MODE_RESET_STC
     };
     checkStatus(mmal_port_parameter_set(_camera->control, &camConfig.hdr), "mmal_port_parameter_set");
@@ -81,6 +81,12 @@ void BerryCam::RaspberryPiCamera::setCameraVideoPort(unsigned int width, unsigne
     _cameraVideoPort->userdata = (MMAL_PORT_USERDATA_T *)this;
 }
 
+//FIXME Ignoring warning
+//  The following boilerplate code causes warning: Use of a signed integer operand with a binary bitwise operator
+//      _format->encoding = MMAL_ENCODING_YV12;
+//      _format->encoding_variant = MMAL_ENCODING_YV12;
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "hicpp-signed-bitwise"
 void BerryCam::RaspberryPiCamera::setVideoFormat(unsigned int width, unsigned int height) {
     _format = _cameraVideoPort->format;
     _format->encoding = MMAL_ENCODING_YV12;
@@ -91,9 +97,10 @@ void BerryCam::RaspberryPiCamera::setVideoFormat(unsigned int width, unsigned in
     _format->es->video.crop.y = 0;
     _format->es->video.crop.width = width;
     _format->es->video.crop.height = height;
-    _format->es->video.frame_rate.num = 30;
+    _format->es->video.frame_rate.num = DEFAULT_ENCODER_TARGET_FRAMES_PER_SECOND;
     _format->es->video.frame_rate.den = 1;
 }
+#pragma clang diagnostic pop
 
 ptree BerryCam::RaspberryPiCamera::getCameraParameters() {
     ptree parameters;
@@ -147,8 +154,8 @@ void BerryCam::RaspberryPiCamera::onFrameReceived(unsigned char *frameData) {
 void BerryCam::RaspberryPiCamera::setFlip(ptree &cameraParameters) {
     MMAL_PARAMETER_MIRROR_T mirror = {{MMAL_PARAMETER_MIRROR, sizeof(MMAL_PARAMETER_MIRROR_T)}, MMAL_PARAM_MIRROR_NONE};
 
-    int horizontalFlip = Utilities::SafeGet<int>(cameraParameters, CAMERA_HORIZONTAL_FLIP, 0);
-    int verticalFlip = Utilities::SafeGet<int>(cameraParameters, CAMERA_VERTICAL_FLIP, 0);
+    int horizontalFlip = Utilities::SafeGet<int>(cameraParameters, CAMERA_HORIZONTAL_FLIP, DEFAULT_CAMERA_HORIZONTAL_FLIP);
+    int verticalFlip = Utilities::SafeGet<int>(cameraParameters, CAMERA_VERTICAL_FLIP, DEFAULT_CAMERA_VERTICAL_FLIP);
     
     if (horizontalFlip && verticalFlip)
         mirror.value = MMAL_PARAM_MIRROR_BOTH;
@@ -163,7 +170,7 @@ void BerryCam::RaspberryPiCamera::setFlip(ptree &cameraParameters) {
 }
 
 void BerryCam::RaspberryPiCamera::setRotation(boost::property_tree::ptree &cameraParameters) {
-    int rotation = Utilities::SafeGet<int>(cameraParameters, CAMERA_ROTATION, 0);
+    int rotation = Utilities::SafeGet<int>(cameraParameters, CAMERA_ROTATION, DEFAULT_CAMERA_ROTATION);
 
     int my_rotation = ((rotation % 360 ) / 90) * 90;
 

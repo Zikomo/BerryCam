@@ -16,7 +16,6 @@ add_executable(${PROJECT_NAME}
         RaspberryPiCamera.h
         UdpBroadcaster.cpp
         UdpBroadcaster.h
-        Utilities.cpp
         Utilities.h
         BerryCamHeader.h)
 

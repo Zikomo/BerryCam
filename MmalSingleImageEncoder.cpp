@@ -117,7 +117,7 @@ void BerryCam::MmalSingleImageEncoder::encode(const void *image) {
     _frameCount++;
 
 
-    int eos = 0;
+    unsigned int eos = 0;
     int sent = 0;
     int outputWritten = 0;
     FILE* outFile;
@@ -200,3 +200,4 @@ void BerryCam::MmalSingleImageEncoder::encode(const void *image) {
     printf("- written %u bytes to %s\n\n", outputWritten, _filename.c_str());
 
 }
+
