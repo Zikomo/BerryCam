@@ -16,7 +16,10 @@ BerryCam::H264Encoder::H264Encoder(std::shared_ptr<Broadcaster> broadcaster) :
         _tempPacket(nullptr),
         _broadcaster(std::move(broadcaster)) {
     std::stringstream errorString;
-    _codec = avcodec_find_encoder_by_name("h264_omx");//avcodec_find_encoder(AV_CODEC_ID_H264);
+    _codec = avcodec_find_encoder_by_name("h264_omx");
+    if (!_codec) {
+        _codec = avcodec_find_encoder(AV_CODEC_ID_H264);
+    }
     if (!_codec) {
         errorString<<"Codec "<<AV_CODEC_ID_H264<<" not found. "<<std::endl;
         throw std::runtime_error(errorString.str());
